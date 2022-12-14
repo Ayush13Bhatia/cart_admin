@@ -1,7 +1,9 @@
 import 'package:cart_admin/components/custom_background.dart';
 import 'package:cart_admin/provider/login_provider.dart';
+import 'package:cart_admin/utils/my_routes.dart';
 import 'package:cart_admin/utils/responsive_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../components/common_button.dart';
@@ -25,6 +27,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     loginProvider = Provider.of<LoginProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.go(MyRoutes.dashboard);
+    });
     super.initState();
   }
 
@@ -114,22 +119,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  // Consumer<LoginProvider>(
-                  //   builder: (BuildContext context, ref, Widget? child) => TextFormField(
-                  //     obscureText: ref.isObscure,
-                  //     controller: passwordController,
-                  //     decoration: InputDecoration(
-                  //       border: const OutlineInputBorder(),
-                  //       labelText: "6 + character required ",
-                  //       suffixIcon: GestureDetector(
-                  //         onTap: () {
-                  //           ref.toggleObscure();
-                  //         },
-                  //         child: !ref.isObscure ? const Icon(Icons.visibility_off) : const Icon(Icons.visibility),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                   const SizedBox(
                     height: 10,
                   ),
@@ -151,19 +140,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                     ),
                   ),
-                  // Consumer<LoginProvider>(
-                  //   builder: (_, ref, child) => Row(
-                  //     children: [
-                  //       Checkbox(
-                  //         value: ref.isChecked,
-                  //         onChanged: (bool? checked) {
-                  //           ref.toggleChecked(checked ?? false);
-                  //         },
-                  //       ),
-                  //       const Text("Remember me"),
-                  //     ],
-                  //   ),
-                  // ),
                   const SizedBox(
                     height: 10,
                   ),
@@ -176,27 +152,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       onPressed: ref.isLoading
                           ? null
-                          : () {
-                              ref.login("username", "password");
+                          : () async {
+                              bool b = await ref.login(emailController.text, passwordController.text);
+                              if (b && mounted) {
+                                context.go(MyRoutes.dashboard);
+                              } else {
+                                print("Invalid input");
+                              }
                             },
                       borderRadius: 8,
                       verticalPadding: 10,
                     ),
                   ),
-                  // Consumer<LoginProvider>(
-                  //   builder: (_, ref, child) => SizedBox(
-                  //     width: double.infinity,
-                  //     child: ElevatedButton(
-                  //       style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                  //       onPressed: ref.isLoading
-                  //           ? null
-                  //           : () {
-                  //               ref.login('username', 'password');
-                  //             },
-                  //       child: ref.isLoading ? const Text("Loading...") : const Text("Login"),
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
             ),
