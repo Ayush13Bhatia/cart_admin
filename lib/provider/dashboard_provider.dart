@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class DashboardProvider with ChangeNotifier {
-  bool _isDrawerExpanded = false;
+  bool _isDrawerExpanded = true;
 
   bool get drawerExpanded => _isDrawerExpanded;
 

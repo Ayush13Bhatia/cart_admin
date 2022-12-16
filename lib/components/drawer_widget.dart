@@ -16,7 +16,7 @@ class DrawerWidget extends StatelessWidget {
     return Consumer<DashboardProvider>(
       builder: (_, ref, child) {
         return AnimatedContainer(
-          width: (isExpanded ?? true) ? size.width * 0.2 : 100,
+          width: (isExpanded ?? true) ? size.width * 0.2 : 80,
           duration: const Duration(
             milliseconds: 300,
           ),

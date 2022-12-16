@@ -19,16 +19,22 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
   bool? check = false;
   bool? obscure = false;
+
   late LoginProvider loginProvider;
+
+  final FocusNode _emailNode = FocusNode();
+  final FocusNode _passwordNode = FocusNode();
+
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
   @override
   void initState() {
     loginProvider = Provider.of<LoginProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.go(MyRoutes.dashboard);
+      context.go(MyRoutes.login);
     });
     super.initState();
   }
@@ -153,12 +159,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: ref.isLoading
                           ? null
                           : () async {
-                              bool b = await ref.login(emailController.text, passwordController.text);
-                              if (b && mounted) {
-                                context.go(MyRoutes.dashboard);
-                              } else {
-                                print("Invalid input");
-                              }
+                              // bool isLogin = await ref.login(emailController.text, passwordController.text);
+                              // if (isLogin && mounted) {
+                              context.go(MyRoutes.dashboard);
+                              // } else {
+                              //   print("Invalid input");
+                              // }
                             },
                       borderRadius: 8,
                       verticalPadding: 10,

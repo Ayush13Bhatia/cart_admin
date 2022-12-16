@@ -1,7 +1,9 @@
 import 'package:cart_admin/components/drawer_widget.dart';
 import 'package:cart_admin/provider/dashboard_provider.dart';
+import 'package:cart_admin/utils/my_routes.dart';
 import 'package:cart_admin/utils/my_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/responsive_builder.dart';
@@ -17,6 +19,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Consumer<DashboardProvider>(
       builder: (_, ref, child) {
         return Scaffold(
@@ -30,8 +33,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               appBar: AppBar(
                 title: const Text("Dashboard"),
               ),
-              drawer: const Drawer(
-                child: DrawerWidget(),
+              drawer: SizedBox(
+                width: size.width * 0.6,
+                child: const Drawer(
+                  child: DrawerWidget(
+                    isExpanded: true,
+                  ),
+                ),
               ),
               body: Center(
                 child: ElevatedButton(
@@ -85,7 +93,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Expanded(
                 child: Center(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.go(MyRoutes.login);
+                    },
                     child: const Text("LogOut"),
                   ),
                 ),
