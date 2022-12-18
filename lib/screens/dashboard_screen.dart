@@ -2,10 +2,13 @@ import 'package:cart_admin/components/drawer_widget.dart';
 import 'package:cart_admin/provider/dashboard_provider.dart';
 import 'package:cart_admin/utils/my_routes.dart';
 import 'package:cart_admin/utils/my_theme.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../components/profile_menu_widget.dart';
+import '../provider/login_provider.dart';
 import '../utils/responsive_builder.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -17,6 +20,20 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  @override
+  void initState() {
+    // if (FirebaseAuth.instance.currentUser == null) {
+    //   context.replaceNamed(MyRoutes.login);
+    // }
+    bool b = LoginProvider().getLoggedInUser();
+    if (!b) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        context.go(MyRoutes.login);
+      });
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -50,7 +67,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             tablet: Center(
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  // await LoginProvider().logout();
+                  // if (mounted) {
+                  context.go(MyRoutes.login);
+                  // }
+                },
                 child: const Text("LogOut"),
               ),
             ),
@@ -63,6 +85,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget webDashboard(bool expanded, DashboardProvider ref) {
     return Column(
+      // mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Row(
           children: [
@@ -78,10 +101,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ref.toggleExpansion();
               },
               child: Icon(
-                ref.drawerExpanded ? Icons.close_rounded : Icons.menu,
+                ref.drawerExpanded ? Icons.menu : Icons.close_rounded,
                 color: MyTheme.black,
               ),
             ),
+            Expanded(
+              child: Container(),
+            ),
+            ProfileMenuWidget(),
           ],
         ),
         Expanded(
@@ -90,16 +117,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               DrawerWidget(
                 isExpanded: expanded,
               ),
-              Expanded(
+              const Expanded(
                 child: Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      context.go(MyRoutes.login);
-                    },
-                    child: const Text("LogOut"),
+                  child: Text(
+                    "Dashboard",
+                    style: TextStyle(fontSize: 17),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

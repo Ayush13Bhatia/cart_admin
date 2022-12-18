@@ -2,6 +2,7 @@ import 'package:cart_admin/components/custom_background.dart';
 import 'package:cart_admin/provider/login_provider.dart';
 import 'package:cart_admin/utils/my_routes.dart';
 import 'package:cart_admin/utils/responsive_builder.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -32,11 +33,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
+    // if (FirebaseAuth.instance.currentUser == null) {
+    //   context.replaceNamed(MyRoutes.dashboard);
+    // }
     loginProvider = Provider.of<LoginProvider>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.go(MyRoutes.login);
-    });
+    bool b = LoginProvider().getLoggedInUser();
+    if (!b) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go(MyRoutes.login);
+      });
+    }
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
   }
 
   Widget build(BuildContext context) {
@@ -159,12 +172,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: ref.isLoading
                           ? null
                           : () async {
-                              // bool isLogin = await ref.login(emailController.text, passwordController.text);
-                              // if (isLogin && mounted) {
-                              context.go(MyRoutes.dashboard);
-                              // } else {
-                              //   print("Invalid input");
-                              // }
+                              bool isLogin = await ref.login(emailController.text, passwordController.text);
+                              if (isLogin && mounted) {
+                                context.go(MyRoutes.dashboard);
+                              } else {
+                                print("Invalid input");
+                              }
                             },
                       borderRadius: 8,
                       verticalPadding: 10,

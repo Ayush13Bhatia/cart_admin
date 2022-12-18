@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class LoginProvider extends ChangeNotifier {
   bool _isObscure = true;
   bool _isChecked = false;
+  User? currentUser;
 
   bool get isObscure => _isObscure;
   bool get isChecked => _isChecked;
@@ -24,10 +25,30 @@ class LoginProvider extends ChangeNotifier {
   Future<bool> login(String username, String password) async {
     isLoading = true;
     notifyListeners();
-    await Future.delayed(const Duration(seconds: 3), () {});
-    isLoading = false;
-    notifyListeners();
-    return false;
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: username, password: password);
+      currentUser = credential.user;
+      isLoading = false;
+      notifyListeners();
+      return currentUser != null;
+    } on FirebaseAuthException catch (e) {
+      print(e.code);
+      if (e.code == "invalid-email") {
+        print("invalid-email");
+      } else if (e.code == "user-not-found") {
+        print("user-not-found");
+      } else if (e.code == "wrong-password") {
+        print("wrong-password");
+      }
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  bool getLoggedInUser() {
+    currentUser = FirebaseAuth.instance.currentUser;
+    return currentUser != null;
   }
 
   Future<void> logout() async {
