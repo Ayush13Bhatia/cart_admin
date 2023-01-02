@@ -43,7 +43,8 @@ class DrawerItems extends StatelessWidget {
                         children: [
                           Icon(
                             leading,
-                            color: color ?? MyTheme.white,
+                            color:
+                                ref.activeDrawerIndex == id || ref.activeHoverDrawer == id ? MyTheme.drawerActiveTextColor : MyTheme.white,
                             size: 22,
                           ),
                           const SizedBox(
@@ -52,14 +53,18 @@ class DrawerItems extends StatelessWidget {
                           Expanded(
                             child: Text(
                               title,
-                              style: TextStyle(fontSize: 15, color: color ?? MyTheme.white),
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  color: ref.activeDrawerIndex == id || ref.activeHoverDrawer == id
+                                      ? MyTheme.drawerActiveTextColor
+                                      : MyTheme.white),
                             ),
                           ),
                         ],
                       )
                     : Icon(
                         leading,
-                        color: color ?? MyTheme.white,
+                        color: ref.activeDrawerIndex == id || ref.activeHoverDrawer == id ? MyTheme.drawerActiveTextColor : MyTheme.white,
                         size: 22,
                       ),
               ),

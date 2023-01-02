@@ -10,10 +10,14 @@ class TextFormFieldComponent extends StatelessWidget {
   final TextStyle? hintStyle;
   final Widget? suffixWidget;
   final bool? isObscure;
+  final FocusNode? focusNode;
   final TextEditingController? controller;
+  final void Function(String)? onChange;
   const TextFormFieldComponent(
       {Key? key,
+      this.onChange,
       this.controller,
+      this.focusNode,
       this.isObscure,
       this.suffixWidget,
       this.borderColor,
@@ -35,6 +39,8 @@ class TextFormFieldComponent extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           TextFormField(
+            focusNode: focusNode,
+            onChanged: onChange,
             controller: controller,
             // textAlign: TextAlign.start,
             cursorColor: borderColor ?? MyTheme.textFormBorder,

@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:rive/rive.dart';
 
 import '../components/common_button.dart';
 import '../components/custom_text_button.dart';
@@ -25,8 +26,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   late LoginProvider loginProvider;
 
-  final FocusNode _emailNode = FocusNode();
-  final FocusNode _passwordNode = FocusNode();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passFocus = FocusNode();
+
+  StateMachineController? machineController;
+  SMIInput<bool>? isChecking;
+  SMIInput<double>? numLook;
+  SMIInput<bool>? isHandsUp;
+  SMIInput<bool>? trigSuccess;
+  SMIInput<bool>? trigFail;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -37,19 +45,35 @@ class _LoginScreenState extends State<LoginScreen> {
     //   context.replaceNamed(MyRoutes.dashboard);
     // }
     loginProvider = Provider.of<LoginProvider>(context, listen: false);
+    _emailFocus.addListener(emailFocusListener);
+    _passFocus.addListener(passFocusListener);
     bool b = LoginProvider().getLoggedInUser();
     if (!b) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.go(MyRoutes.login);
       });
     }
+
     super.initState();
   }
 
   @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
+  void dispose() {
+    _emailFocus.removeListener(emailFocusListener);
+    _passFocus.removeListener(passFocusListener);
+    // _emailFocus.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    // _passFocus.dispose();
     super.didChangeDependencies();
+  }
+
+  void emailFocusListener() {
+    isChecking?.change(_emailFocus.hasFocus);
+  }
+
+  void passFocusListener() {
+    isHandsUp?.change(_passFocus.hasFocus);
   }
 
   Widget build(BuildContext context) {
@@ -113,23 +137,51 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontSize: 14,
                     ),
                   ),
+                  Center(
+                    child: Container(
+                      height: 200,
+                      width: 200,
+                      child: RiveAnimation.asset(
+                        'assets/rive_animation/login_anim.riv',
+                        stateMachines: ['Login Machine'],
+                        onInit: (board) {
+                          machineController = StateMachineController.fromArtboard(board, "Login Machine");
+                          if (machineController == null) {
+                            return;
+                          }
+                          board.addController(machineController!);
+                          isChecking = machineController?.findInput("isChecking");
+                          numLook = machineController?.findInput("numLook");
+                          isHandsUp = machineController?.findInput("isHandsUp");
+                          trigSuccess = machineController?.findInput("trigSuccess");
+                          trigFail = machineController?.findInput("trigFail");
+                        },
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 30),
                   TextFormFieldComponent(
                     title: "Your Email",
+                    focusNode: _emailFocus,
                     hint: "email@address.com",
                     controller: emailController,
+                    onChange: (st) {
+                      numLook?.change(st.length.toDouble() * 2);
+                    },
                   ),
                   Consumer<LoginProvider>(
                     builder: (_, ref, child) => TextFormFieldComponent(
                       isObscure: ref.isObscure,
                       title: "Password",
                       controller: passwordController,
+                      focusNode: _passFocus,
                       hint: "6+ characters required",
                       suffixWidget: InkWell(
                         splashColor: Colors.white,
                         hoverColor: Colors.white,
                         onTap: () {
                           ref.toggleObscure();
+                          isHandsUp?.change(ref.isObscure);
                         },
                         child: Icon(
                           !ref.isObscure ? Icons.visibility_off : Icons.visibility,
@@ -172,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: ref.isLoading
                           ? null
                           : () async {
-                              bool isLogin = await ref.login(emailController.text, passwordController.text);
+                              bool isLogin = await ref.login(emailController.text.trim(), passwordController.text);
                               if (isLogin && mounted) {
                                 context.go(MyRoutes.dashboard);
                               } else {
